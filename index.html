@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Agent Workshop Handbook - Session 2</title>
+  <style>
+    :root {
+      --navy: #07122f;
+      --navy-2: #0c1839;
+      --panel: rgba(255, 255, 255, 0.07);
+      --line: rgba(255, 255, 255, 0.15);
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --orange: #ff6716;
+      --orange-2: #ff8a3c;
+      --cream: #fff8ea;
+      --muted: #aab3d1;
+      --ink: #0a1023;
+      --shadow: 0 26px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 14% 58%, rgba(255, 103, 22, 0.16), transparent 22rem),
+        radial-gradient(circle at 82% 15%, rgba(255, 103, 22, 0.09), transparent 26rem),
+        var(--navy);
+      line-height: 1.5;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -20vmax;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.46;
+      background:
+        repeating-radial-gradient(circle at 18% 64%,
+          transparent 0,
+          transparent 32px,
+          rgba(255, 255, 255, 0.08) 34px,
+          rgba(255, 255, 255, 0.08) 36px,
+          transparent 38px),
+        repeating-radial-gradient(circle at 82% 22%,
+          transparent 0,
+          transparent 44px,
+          rgba(255, 103, 22, 0.14) 46px,
+          rgba(255, 103, 22, 0.14) 48px,
+          transparent 50px);
+    }
+
+    body::after {
+      opacity: 0.18;
+      transform: rotate(-8deg) scale(1.08);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 44px 0 56px;
+    }
+
+    .site-header,
+    .section-header,
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .site-header {
+      margin-bottom: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      box-shadow: 0 12px 35px rgba(255, 103, 22, 0.2);
+      flex: 0 0 auto;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.27rem;
+      line-height: 1.05;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .brand-subtitle,
+    .eyebrow,
+    .label {
+      color: var(--orange-2);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      gap: 9px;
+      padding: 8px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--cream);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 7px rgba(255, 103, 22, 0.1);
+      flex: 0 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 42px;
+      align-items: start;
+      margin-bottom: 34px;
+    }
+
+    .hero h1 {
+      margin: 16px 0 22px;
+      color: var(--cream);
+      font-size: clamp(3rem, 7vw, 6.35rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+      max-width: 900px;
+    }
+
+    .accent {
+      color: var(--orange);
+      display: block;
+    }
+
+    .lede {
+      max-width: 920px;
+      margin: 0;
+      color: var(--cream);
+      font-size: clamp(1.18rem, 2.2vw, 1.75rem);
+      font-weight: 720;
+    }
+
+    .intro {
+      max-width: 860px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 1.04rem;
+    }
+
+    .lede strong,
+    .intro strong,
+    .table-wrap strong {
+      color: var(--orange-2);
+    }
+
+    .goal-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(150deg, rgba(255, 103, 22, 0.16), rgba(255, 255, 255, 0.06));
+      border-radius: 8px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 22px;
+    }
+
+    .goal-card h2 {
+      margin: 0 0 18px;
+      font-size: 1.35rem;
+    }
+
+    .goal-list,
+    .plain-list,
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .goal-list li,
+    .plain-list li,
+    .summary-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--cream);
+      font-weight: 720;
+    }
+
+    .check {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid rgba(255, 103, 22, 0.55);
+      border-radius: 7px;
+      background: rgba(255, 103, 22, 0.12);
+      color: var(--orange-2);
+      font-size: 0.84rem;
+      font-weight: 900;
+    }
+
+    .section {
+      margin-top: 46px;
+    }
+
+    .section-header {
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .section h2 {
+      margin: 8px 0 0;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      max-width: 680px;
+      margin: 0;
+    }
+
+    .panel,
+    .step-card,
+    .table-wrap,
+    .preview {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.065);
+      border-radius: 8px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+      min-width: 0;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h3,
+    .step-card h3,
+    .callout h3 {
+      margin: 0 0 10px;
+    }
+
+    .panel p,
+    .step-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel .intro {
+      margin-top: 18px;
+    }
+
+    .insight-grid,
+    .takeaway-grid,
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      border: 1px solid rgba(255, 103, 22, 0.34);
+      background: rgba(255, 103, 22, 0.1);
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    .flow-item {
+      display: grid;
+      place-items: center;
+      min-height: 72px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(3, 9, 26, 0.5);
+      color: var(--cream);
+      text-align: center;
+      font-weight: 860;
+    }
+
+    .step-card {
+      padding: 22px;
+      min-height: 230px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .number {
+      color: var(--orange);
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .icon {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 103, 22, 0.35);
+      border-radius: 8px;
+      background: rgba(255, 103, 22, 0.12);
+      color: var(--orange-2);
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .os-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 14px;
+    }
+
+    .os-box,
+    .callout {
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: rgba(3, 9, 26, 0.42);
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .os-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--cream);
+      font-weight: 850;
+      font-size: 0.93rem;
+    }
+
+    code,
+    pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    code {
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 8px 0 0;
+      padding: 12px;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: rgba(2, 6, 19, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f9fbff;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note {
+      display: flex;
+      gap: 10px;
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .note::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-top: 0.5em;
+      border-radius: 50%;
+      background: var(--orange);
+      flex: 0 0 auto;
+    }
+
+    .split-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .split-card > * {
+      min-width: 0;
+    }
+
+    .callout {
+      background: rgba(255, 103, 22, 0.13);
+      border-color: rgba(255, 103, 22, 0.34);
+    }
+
+    .callout p {
+      margin: 0;
+      color: var(--cream);
+      font-weight: 720;
+    }
+
+    .milestone {
+      margin-top: 16px;
+      border: 1px solid rgba(255, 103, 22, 0.48);
+      background:
+        radial-gradient(circle at 18% 40%, rgba(255, 255, 255, 0.16), transparent 14rem),
+        linear-gradient(135deg, #ff6716, #ff8a3c);
+      border-radius: 8px;
+      padding: 28px;
+      color: #160b04;
+      box-shadow: var(--shadow);
+    }
+
+    .milestone h3 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1;
+    }
+
+    .milestone p,
+    .milestone li {
+      color: rgba(22, 11, 4, 0.82);
+      font-weight: 780;
+    }
+
+    .milestone .plain-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .milestone .check {
+      border-color: rgba(22, 11, 4, 0.35);
+      background: rgba(22, 11, 4, 0.12);
+      color: #160b04;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      box-shadow: none;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    th,
+    td {
+      padding: 16px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--orange-2);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 0.74rem;
+    }
+
+    td {
+      color: var(--cream);
+      font-weight: 650;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: 0.75fr 1fr;
+      gap: 18px;
+      padding: 24px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .session-number {
+      color: var(--orange);
+      font-size: clamp(5rem, 18vw, 11rem);
+      line-height: 0.85;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .summary-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 18px;
+      margin-top: 20px;
+    }
+
+    .footer {
+      padding-top: 40px;
+      color: var(--muted);
+      font-weight: 720;
+    }
+
+    .footer strong {
+      color: var(--cream);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .split-card,
+      .preview,
+      .insight-grid,
+      .takeaway-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow {
+        grid-template-columns: 1fr;
+      }
+
+      .goal-card {
+        position: static;
+      }
+
+      .steps,
+      .summary-list,
+      .milestone .plain-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        width: min(100% - 28px, 1180px);
+        padding-top: 24px;
+      }
+
+      .site-header,
+      .section-header,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .badge-row {
+        justify-content: flex-start;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.65rem, 16vw, 4.5rem);
+      }
+
+      .os-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step-card {
+        padding: 18px;
+      }
+
+      table {
+        min-width: 100%;
+      }
+
+      th,
+      td {
+        padding: 13px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="site-header" aria-label="Workshop header">
+      <a class="brand" href="index.html">
+        <img src="assets/rr-logo.png" alt="Roadmap Refugees logo" />
+        <div>
+          <p class="brand-title">Roadmap Refugees</p>
+          <div class="brand-subtitle">AI Series</div>
+        </div>
+      </a>
+      <div class="badge-row" aria-label="Workshop details">
+        <span class="pill"><span class="dot"></span> Session 2</span>
+        <span class="pill">Hands-on</span>
+        <a class="pill" href="tools-mindmap.html">Tools Map</a>
+        <a class="pill" href="pm-ai-product-playbook.html">PM Playbook</a>
+        <a class="pill" href="index.html">Session 1</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">AI Agent Workshop</div>
+        <h1>Session 2 <span class="accent">Why AI Gets Things Wrong</span></h1>
+        <p class="lede">Your participant handbook for teaching an AI system to read a real document, retrieve evidence, and answer with context.</p>
+        <p class="intro">Session 2 turns the local setup from Session 1 into a basic retrieval system. <strong>No ML theory required.</strong> We will learn the moving parts by making them visible.</p>
+      </div>
+
+      <aside class="goal-card" aria-labelledby="goal-title">
+        <div class="label">Goal</div>
+        <h2 id="goal-title">You will build</h2>
+        <ul class="goal-list">
+          <li><span class="check">&check;</span><span>A document reader for a PDF report</span></li>
+          <li><span class="check">&check;</span><span>A chunking strategy</span></li>
+          <li><span class="check">&check;</span><span>A local embedding workflow</span></li>
+          <li><span class="check">&check;</span><span>A small vector database</span></li>
+          <li><span class="check">&check;</span><span>A retrieval-augmented answer flow</span></li>
+          <li><span class="check">&check;</span><span>A product view of reliability trade-offs</span></li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="section" aria-labelledby="reframe-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">The big idea</div>
+          <h2 id="reframe-title">The Model Is Not The Whole Product</h2>
+        </div>
+        <p class="section-copy">Most useful AI products do not ask a model to remember everything. They bring the right evidence to the model at the right moment.</p>
+      </div>
+      <div class="insight-grid">
+        <article class="panel">
+          <h3>Without retrieval</h3>
+          <p>The model answers from its training, guesses, or admits it does not know. This can sound confident even when the answer is wrong.</p>
+        </article>
+        <article class="panel">
+          <h3>With retrieval</h3>
+          <p>The system searches a trusted document first, sends relevant excerpts to the model, and asks it to answer using that evidence.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="system-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">The workflow</div>
+          <h2 id="system-title">What We Are Building Today</h2>
+        </div>
+        <p class="section-copy">A simple retrieval augmented generation workflow. Product teams often call this RAG.</p>
+      </div>
+      <div class="workflow" aria-label="Session 2 retrieval workflow">
+        <div class="flow-item">PDF</div>
+        <div class="flow-item">Text</div>
+        <div class="flow-item">Chunks</div>
+        <div class="flow-item">Embeddings</div>
+        <div class="flow-item">Vector Store</div>
+        <div class="flow-item">Retrieved Evidence</div>
+        <div class="flow-item">Answer</div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="visualizer-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">See it first</div>
+          <h2 id="visualizer-title">See The Pipeline Before The Code</h2>
+        </div>
+        <p class="section-copy">The visualizer shows the same journey before we run it locally: source text, chunks, embeddings, vector storage, retrieval, and grounded answer.</p>
+      </div>
+      <div class="insight-grid">
+        <article class="panel">
+          <h3>Use the visualizer for the mental model</h3>
+          <p>Click through the facilitator-led pipeline once before the checklist. It makes each code step feel like a product workflow instead of a pile of scripts.</p>
+        </article>
+        <article class="panel">
+          <h3>Use the playbook for product judgement</h3>
+          <p>The lab shows how retrieval runs. The playbook shows what PMs must decide: sources, freshness, citations, latency, cost, and failure modes.</p>
+          <p class="intro"><a class="pill" href="pm-ai-product-playbook.html">Open PM Playbook</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="code-baseline-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Workshop approach</div>
+          <h2 id="code-baseline-title">Use The Tested Workshop Code First</h2>
+        </div>
+        <p class="section-copy">Everyone will start from the same working code so the room can focus on understanding the system, not debugging different versions.</p>
+      </div>
+      <div class="insight-grid">
+        <article class="panel">
+          <h3>Baseline first</h3>
+          <p>We will run the tested workshop files end to end: extract the PDF, create chunks, embed them, and retrieve evidence from the local vector database.</p>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span><code>scripts/01_extract_pdf.py</code></span></li>
+            <li><span class="check">&check;</span><span><code>scripts/02_chunk_basic.py</code> and <code>scripts/03_chunk_section_aware.py</code></span></li>
+            <li><span class="check">&check;</span><span><code>scripts/04_embed_basic_chunks.py</code> and <code>scripts/07_embed_chunks_section_aware.py</code></span></li>
+            <li><span class="check">&check;</span><span><code>scripts/05_retrieve.py</code> and <code>scripts/06_retrieve_multi.py</code></span></li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Experiment second</h3>
+          <p>Once the baseline works, we will change one thing at a time and compare what happens. This is where the product learning becomes visible.</p>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span>Change chunk size and overlap</span></li>
+            <li><span class="check">&check;</span><span>Compare basic and section-aware chunking</span></li>
+            <li><span class="check">&check;</span><span>Change the question wording</span></li>
+            <li><span class="check">&check;</span><span>Change how many chunks are retrieved</span></li>
+          </ul>
+        </article>
+      </div>
+      <p class="intro">Participants do not need to write the whole pipeline from scratch. Their job is to run it, inspect it, understand each part, and then experiment with controlled changes.</p>
+    </section>
+
+    <section class="section" aria-labelledby="checkpoint-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Product checkpoint</div>
+          <h2 id="checkpoint-title">Decide What Quality Means</h2>
+        </div>
+        <p class="section-copy">Before testing answers, name the product constraints. These questions decide whether the system is trustworthy enough.</p>
+      </div>
+      <div class="insight-grid">
+        <article class="panel">
+          <h3>Source And Evidence</h3>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span>What source is trusted?</span></li>
+            <li><span class="check">&check;</span><span>How fresh is it?</span></li>
+            <li><span class="check">&check;</span><span>Do users need citations?</span></li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Behaviour And UX</h3>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span>What happens when retrieval is weak?</span></li>
+            <li><span class="check">&check;</span><span>What latency is acceptable?</span></li>
+            <li><span class="check">&check;</span><span>What should the system refuse to answer?</span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="setup-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">The path</div>
+          <h2 id="setup-title">Session 2 Checklist</h2>
+        </div>
+        <p class="section-copy">Work through these in order using the tested workshop code. Each step has a plain-English purpose and a small verification point.</p>
+      </div>
+
+      <div class="steps">
+        <article class="step-card">
+          <div class="step-top">
+            <span class="number">Start</span>
+            <span class="icon" aria-hidden="true">&gt;_</span>
+          </div>
+          <h3>Restart The Workshop Environment</h3>
+          <p>Open the portable workshop folder and switch the project environment back on.</p>
+          <div class="os-grid">
+            <div class="os-box">
+              <div class="os-title">Mac</div>
+              <pre><code>cd path/to/ai-agent-workshop
+source venv/bin/activate</code></pre>
+            </div>
+            <div class="os-box">
+              <div class="os-title">Windows</div>
+              <pre><code>cd path\to\ai-agent-workshop
+venv\Scripts\activate</code></pre>
+            </div>
+          </div>
+          <div class="note">Replace <code>path/to/ai-agent-workshop</code> or <code>path\to\ai-agent-workshop</code> with wherever you saved the workshop folder. You should see <code>(venv)</code> in the terminal prompt.</div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-top">
+            <span class="number">0</span>
+            <span class="icon" aria-hidden="true">AI</span>
+          </div>
+          <h3>Confirm The Embedding Model</h3>
+          <p>Session 1 installed the tools and Python packages. For Session 2, make sure Ollama has <code>nomic-embed-text</code>, the model that turns text into embeddings so similar meanings can be searched.</p>
+          <pre><code>ollama pull nomic-embed-text
+ollama list</code></pre>
+          <div class="note">If you missed Session 1 setup, complete the Session 1 checklist first so Python, Ollama, the virtual environment, and the Python packages are ready.</div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-top">
+            <span class="number">1</span>
+            <span class="icon" aria-hidden="true">PDF</span>
+          </div>
+          <h3>Add The AusPost Report</h3>
+          <p>Put the PDF from Slack into the project data folder.</p>
+          <pre><code>data/auspost_annual_report.pdf</code></pre>
+          <div class="note">The scripts use this filename by default. If the file is somewhere else, pass <code>--pdf /path/to/file.pdf</code>.</div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-top">
+            <span class="number">2</span>
+            <span class="icon" aria-hidden="true">TXT</span>
+          </div>
+          <h3>Check PDF Extraction</h3>
+          <p>The first job is confirming that Python can read text from the PDF. This script uses <code>pypdf</code> to open the report and preview extracted text.</p>
+          <pre><code>python scripts/01_extract_pdf.py</code></pre>
+          <div class="note">If extraction is blank or scrambled, the AI product will fail before the model is even involved.</div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">3</span>
+              <span class="icon" aria-hidden="true">CUT</span>
+            </div>
+            <h3>Create Basic Chunks</h3>
+            <p>Chunking breaks a long document into smaller pieces the system can search. Basic chunking splits by size, which is easy to understand but can cut across document sections.</p>
+            <pre><code>python scripts/02_chunk_basic.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Output</h3>
+            <p>This creates <code>outputs/auspost_chunks.json</code>. Basic chunks are useful for comparison, but they do not understand document sections.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">4</span>
+              <span class="icon" aria-hidden="true">EMB</span>
+            </div>
+            <h3>Embed The Basic Chunks</h3>
+            <p>An embedding is a numerical fingerprint of meaning. The script uses <code>nomic-embed-text</code> to embed each basic chunk.</p>
+            <pre><code>python scripts/04_embed_basic_chunks.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Teaching move</h3>
+            <p>Use this after <code>02_chunk_basic.py</code>. The retrieved results will show what the basic chunks make easy or hard to find.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">5</span>
+              <span class="icon" aria-hidden="true">GET</span>
+            </div>
+            <h3>Test Basic Chunk Retrieval</h3>
+            <p>This retrieves the most relevant chunks from the vector database for the question. We are testing retrieval quality first, before asking any model to write an answer.</p>
+            <pre><code>python scripts/05_retrieve.py --question "What was Australia Post revenue in FY25?"</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Look for evidence</h3>
+            <p>The test is whether the retrieved text contains the answer, not whether the model can generate a polished response.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">6</span>
+              <span class="icon" aria-hidden="true">CUT</span>
+            </div>
+            <h3>Create Section-Aware Chunks</h3>
+            <p>This is the improved chunking step. It keeps page ranges, section labels, chunk IDs, and overlap.</p>
+            <pre><code>python scripts/03_chunk_section_aware.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Trade-off</h3>
+            <p>Chunks that are too small lose context. Chunks that are too large can bury the answer. Section-aware chunks help preserve meaning.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">7</span>
+              <span class="icon" aria-hidden="true">EMB</span>
+            </div>
+            <h3>Embed The Section-Aware Chunks</h3>
+            <p>Turn the section-aware chunks into vectors so we can test whether this chunking strategy retrieves useful evidence.</p>
+            <pre><code>python scripts/07_embed_chunks_section_aware.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Output</h3>
+            <p>This creates the local vector database in <code>outputs/chroma_db/</code>.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">8</span>
+              <span class="icon" aria-hidden="true">GET</span>
+            </div>
+            <h3>Test Section-Aware Retrieval</h3>
+            <p>Ask the same question again and compare whether the retrieved chunks are better evidence.</p>
+            <pre><code>python scripts/05_retrieve.py --question "What was Australia Post revenue in FY25?"</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Important</h3>
+            <p>Retrieval quality controls answer quality. The model can only reason over what we give it.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">9</span>
+              <span class="icon" aria-hidden="true">SEM</span>
+            </div>
+            <h3>Create Semantic Chunks</h3>
+            <p>Semantic chunking uses <code>nomic-embed-text</code> to compare neighbouring text units and split when meaning changes.</p>
+            <pre><code>python scripts/08_chunk_semantic.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Output</h3>
+            <p>This creates <code>outputs/auspost_semantic_chunks.json</code>. To embed those chunks, run <code>python scripts/07_embed_chunks_section_aware.py --chunks outputs/auspost_semantic_chunks.json</code>.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide">
+          <div class="step-top">
+            <span class="number">Compare</span>
+            <span class="icon" aria-hidden="true">CUT</span>
+          </div>
+          <h3>Four Ways To Chunk A Document</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Chunking type</th>
+                  <th>How it works</th>
+                  <th>When it helps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Simple</td><td>Splits text by size.</td><td>Fast baseline for comparison.</td></tr>
+                <tr><td>Section-aware</td><td>Respects document sections, page ranges, IDs, and overlap.</td><td>Better context for structured documents.</td></tr>
+                <tr><td>Semantic</td><td>Uses embeddings to detect meaning changes.</td><td>Better topic boundaries when headings are not enough.</td></tr>
+                <tr><td>Hierarchical</td><td>Uses small chunks for matching and larger parent chunks for context.</td><td>Production retrieval where precision and context both matter.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">DIY Next</span>
+              <span class="icon" aria-hidden="true">H</span>
+            </div>
+            <h3>Where This Goes Next</h3>
+            <p>Hierarchical chunking uses small chunks for precise matching and larger parent chunks for context. We are not implementing it today.</p>
+            <pre><code>Small chunks = better matching
+Large parent chunks = better context</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Production pattern</h3>
+            <p>Today we compare basic, section-aware, and semantic chunks. Hierarchical chunking is the next production-grade idea after that comparison makes sense.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">10</span>
+              <span class="icon" aria-hidden="true">GET</span>
+            </div>
+            <h3>Try Multi-Query Retrieval</h3>
+            <p>One user question can be searched several ways. This script combines and ranks the best retrieved chunks.</p>
+            <pre><code>python scripts/06_retrieve_multi.py</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Reliability move</h3>
+            <p>Multi-query retrieval helps when the first wording misses the evidence. It is still retrieval, not reasoning.</p>
+          </div>
+        </article>
+
+        <article class="step-card wide split-card">
+          <div>
+            <div class="step-top">
+              <span class="number">11</span>
+              <span class="icon" aria-hidden="true">QA</span>
+            </div>
+            <h3>Break The System On Purpose</h3>
+            <p>Good product teams test where the system fails, not only where it works.</p>
+            <pre><code>python scripts/05_retrieve.py --question "What was Australia Post revenue in FY25?"
+python scripts/05_retrieve.py --question "What is the CEO's favourite movie?"
+python scripts/05_retrieve.py --n-results 8
+python scripts/03_chunk_section_aware.py --max-words 500 --overlap-words 80</code></pre>
+          </div>
+          <div class="callout">
+            <h3>Discussion</h3>
+            <p>When it fails, ask whether the issue came from the document, chunking, embeddings, retrieval, prompting, or the model.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="milestone" aria-labelledby="milestone-title">
+        <h3 id="milestone-title">Session 2 Outcome</h3>
+        <p>You have built the core reading pattern behind many AI products.</p>
+        <ul class="plain-list">
+          <li><span class="check">&check;</span><span>Document in</span></li>
+          <li><span class="check">&check;</span><span>Evidence retrieved</span></li>
+          <li><span class="check">&check;</span><span>Portable RAG setup working</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="failure-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Product judgement</div>
+          <h2 id="failure-title">Failure Modes To Notice</h2>
+        </div>
+        <p class="section-copy">These are the questions PMs and Designers should ask when an AI answer looks wrong.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Failure mode</th>
+              <th>What it looks like</th>
+              <th>Product question</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Bad extraction</td><td>Text is missing, scrambled, or full of table noise</td><td>Do we need better parsing or source formatting?</td></tr>
+            <tr><td>Bad chunking</td><td>The answer is split across chunks</td><td>What chunk size fits this content?</td></tr>
+            <tr><td>Bad retrieval</td><td>The system fetches plausible but irrelevant evidence</td><td>How do we measure retrieval quality?</td></tr>
+            <tr><td>Weak guardrail</td><td>The model answers beyond the evidence</td><td>Should the product say "I don't know" more often?</td></tr>
+            <tr><td>No citation</td><td>Users cannot check the source</td><td>What proof does the user need to trust this?</td></tr>
+            <tr><td>Latency</td><td>The answer is technically right but too slow</td><td>Where is the acceptable speed-quality trade-off?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="terms-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">What we learned</div>
+          <h2 id="terms-title">Engineer Terms, Plain English</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Engineer term</th>
+              <th>Plain English</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>RAG</td><td>Retrieve trusted information before asking the model to answer</td></tr>
+            <tr><td>Chunk</td><td>A small piece of a larger document</td></tr>
+            <tr><td>Embedding</td><td>A number-based representation of meaning</td></tr>
+            <tr><td>Vector database</td><td>A searchable store for embeddings and source text</td></tr>
+            <tr><td>Similarity search</td><td>Finding text that is close in meaning to the question</td></tr>
+            <tr><td>Grounding</td><td>Forcing the answer to rely on provided evidence</td></tr>
+            <tr><td>Citation</td><td>A pointer back to the source the answer used</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section preview" aria-labelledby="preview-title">
+      <div class="session-number">3</div>
+      <div>
+        <div class="eyebrow">Session 3 preview</div>
+        <h2 id="preview-title">Teach AI To Think In Steps</h2>
+        <ul class="summary-list">
+          <li><span class="check">&check;</span><span>Add a planner</span></li>
+          <li><span class="check">&check;</span><span>Evaluate retrieved evidence</span></li>
+          <li><span class="check">&check;</span><span>Extract facts before answering</span></li>
+          <li><span class="check">&check;</span><span>Introduce workflow state</span></li>
+          <li><span class="check">&check;</span><span>Build a simple agent loop</span></li>
+          <li><span class="check">&check;</span><span>Discuss where autonomy is risky</span></li>
+        </ul>
+        <p class="intro">Session 3 moves from one-shot retrieval to a controlled workflow: plan, retrieve, evaluate, extract, answer.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="takeaways-title">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Product judgement</div>
+          <h2 id="takeaways-title">PM Takeaways</h2>
+        </div>
+        <p class="section-copy">Retrieval is not an implementation detail. It shapes trust, UX, cost, speed, quality, and accountability.</p>
+      </div>
+      <div class="takeaway-grid">
+        <article class="panel">
+          <h3>PMs Should Ask</h3>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span>What sources are trusted?</span></li>
+            <li><span class="check">&check;</span><span>How fresh is the knowledge?</span></li>
+            <li><span class="check">&check;</span><span>Can users inspect citations?</span></li>
+            <li><span class="check">&check;</span><span>What should happen when evidence is weak?</span></li>
+            <li><span class="check">&check;</span><span>How will we evaluate answer quality?</span></li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Designers Should Notice</h3>
+          <ul class="plain-list">
+            <li><span class="check">&check;</span><span>Where confidence is implied</span></li>
+            <li><span class="check">&check;</span><span>How evidence is shown</span></li>
+            <li><span class="check">&check;</span><span>What "I don't know" feels like</span></li>
+            <li><span class="check">&check;</span><span>How users recover from a bad answer</span></li>
+            <li><span class="check">&check;</span><span>Whether the system earns trust over time</span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div><strong>Roadmap Refugees</strong> AI Series</div>
+      <div>AI Agent Workshop Handbook - Session 2</div>
+    </footer>
+  </main>
+</body>
+</html>
